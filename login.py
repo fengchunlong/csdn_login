@@ -4,9 +4,10 @@ from bs4 import BeautifulSoup
 
 def get_headers():
     return {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+        'Host': 'passport.csdn.net',
+        'Referer': 'https://www.csdn.net/'
     }
-
 
 def write_html(text, filename):
     """
@@ -41,6 +42,8 @@ if __name__ == '__main__':
     lt = soup.select('input[name="lt"]')[0]['value']
     # 获取登入页面的input标签中execution的值，后面post表单上传登入信息需要
     execution = soup.select('input[name="execution"]')[0]['value']
+
+    fkid = soup.select('input[name="fkid"]')[0]['value']
     # 上传表单的data数据
     data = {
         "gps": '',
@@ -50,11 +53,12 @@ if __name__ == '__main__':
         "execution": execution,
         "_eventId": "submit",
         "rememberMe": "true",
-        "fkid": "WHJMrwNw1k/HzTA7IvIcrTpfGOeUt/AE3UtN9XUbq9ECVLfka25tkEchZGkYpGcbdWMACtLuOF/82R+Oa4wPMI7qT/5eBtVi0w7gvrI9Ro6Q5138rRvCQ95SD3EmPbcN1b2GXgZ5AQVJzSL+ReTU1WzAvNxHV8cnX6G72ktJg/NYTJrGzzeI4gsNcPMaIcLystsrTOKgDOsDNtAKvckCXn/y8OemG6f1cLmht9Tx6XgUe+WTu0kwnSNwuOXG+4ocFQ2C5nbwxLKYXXT+s9g2g3A==1487582755342"
+        "fkid": fkid
     }
 
     # 打印data数据
     print(data)
+    exit()
 
     # post请求上传data数据，模拟登入，获取响应结果
     # headers = response.headers
@@ -73,15 +77,17 @@ if __name__ == '__main__':
         'Upgrade-Insecure-Requests': '1',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
     }
-    response = seesion.post(login_verify, data=data, headers=headers)
+    response = seesion.post(login_verify, data=data, headers=headers,allow_redirects=False)
     # # 打印响应的状态码
     print(response.status_code)
+    print(response.headers['Location'])
+    print(response.headers)
     # # 将响应的信息写入文件
     write_html(response.text, 'login_success.html')
     #
-    # 通过get请求，请求个人主页，如果没有登入成功，则会返回登页，登入成功，则会获取到登入的个人信息
-    response = seesion.get('https://my.csdn.net/my/mycsdn', headers=get_headers())
-    # # 打印响应码
-    print(response.status_code)
-    # # 将响应结果保存文件
-    write_html(response.text,'my.html')
+    # # 通过get请求，请求个人主页，如果没有登入成功，则会返回登页，登入成功，则会获取到登入的个人信息
+    # response = seesion.get('https://my.csdn.net/my/mycsdn', headers=get_headers(),allow_redirects=False)
+    # # # 打印响应码
+    # print(response.status_code)
+    # # # 将响应结果保存文件
+    # write_html(response.text,'my.html')
